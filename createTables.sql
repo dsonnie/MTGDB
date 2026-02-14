@@ -1,6 +1,6 @@
 -- File: createTables.sql
 -- Project: MTG Card Database
--- Description: Normalized schema for MTG cards and mana costs
+-- Description: Normalized schema for MTG cards
 -- Author: Dave Sonnie
 -- Copyright (c) 2026 Dave Sonnie
 
