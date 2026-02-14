@@ -11,7 +11,7 @@ Copyright (c) 2026 Dave Sonnie
 # Use or adjust as necessary based on the specific implementation
 import csv
 
-csv_file = 'Postgres\Postgres-MTG\cards.csv'
+csv_file = 'cards.csv'
 table_name = 'staging_cards'
 
 with open(csv_file, newline="", encoding="utf-8") as f: 
