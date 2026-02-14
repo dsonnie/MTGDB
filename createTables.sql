@@ -1,23 +1,8 @@
-/*
-CSV columns we are using:
-artist
-availability    -- format
-keywords
-loyalty
-manaCost
-name
-originalText
-otherFaceIds
-power
-rarity
-setCode
-subtypes
-supertypes
-text
-toughness
-types
-uuid
-*/
+-- Project: MTG Card Database Schema
+-- Description: Normalized schema for MTG cards and mana costs
+-- Author: Dave Sonnie
+-- Copyright (c) 2026 Dave Sonnie
+
 
 -- Flush dependants first
 DROP TABLE IF EXISTS card_type_bridge;
