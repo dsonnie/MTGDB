@@ -1,5 +1,5 @@
 """
-File: 01_staging_prep.py
+File: 01_staging.py
 Project: MTG Card Database
 Description: Generates code to create the staging table from the flat csv file
 Author: Dave Sonnie
