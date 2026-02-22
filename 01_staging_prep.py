@@ -12,15 +12,27 @@ Copyright (c) 2026 Dave Sonnie
 import csv
 import os
 import psycopg
+from pathlib import Path
+from dotenv import load_dotenv
 
-working_dir = 'Postgres' + os.sep + 'Postgres-MTG'
-csv_file = 'cards.csv'
-table_name = 'staging_cards'
+load_dotenv() # For .env file
 
-# Docker Postgres
-DATABASE_URL = "postgresql://mtg_admin@localhost:5432/mtg_db"
+BASE_DIR = Path(__file__).resolve().parent
+CSV_FILE_NAME = 'cards.csv'
+CSV_FILE_PATH = BASE_DIR / CSV_FILE_NAME
+TABLE_NAME = 'staging_cards'
 
-with open(csv_file, newline="", encoding="utf-8") as f: 
+DB_CONFIG = {
+    "host": os.getenv("DB_HOST"),
+    "port": os.getenv("DB_PORT"),
+    "dbname": os.getenv("DB_NAME"),
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASSWORD"),
+}
+
+# ---------- Query Build ----------
+# Build the staging table creation query from the csv headers
+with open(CSV_FILE_PATH, newline="", encoding="utf-8") as f: 
     reader = csv.reader(f)
     headers = next(reader)
 
@@ -29,28 +41,20 @@ columns = ',\n'.join(
 )
 
 # Build query
-create_sql = f"""
-CREATE TABLE IF NOT EXISTS {table_name} (
-{columns}
-);
-"""
-
-#create_sql = f'CREATE TABLE IF NOT EXISTS {table_name} ({columns});';
-#print(create_sql)
-
+create_sql = f'CREATE TABLE IF NOT EXISTS {TABLE_NAME} ({columns});';
 
 # ---------- EXECUTE ----------
-with psycopg.connect(DATABASE_URL) as conn:
+with psycopg.connect(**DB_CONFIG) as conn:
     with conn.cursor() as cur:
 
         # Cleanup old staging table if it exists
-        cur.execute(f'DROP TABLE IF EXISTS {table_name} CASCADE;')
+        cur.execute(f'DROP TABLE IF EXISTS {TABLE_NAME} CASCADE;')
         # Create table
         cur.execute(create_sql)
 
         # Bulk load CSV
-        with open(csv_file, "r", encoding="utf-8") as f:
-            with cur.copy(f"COPY {table_name} FROM STDIN WITH CSV HEADER") as copy:
+        with open(CSV_FILE_PATH, "r", encoding="utf-8") as f:
+            with cur.copy(f"COPY {TABLE_NAME} FROM STDIN WITH CSV HEADER") as copy:
                 copy.write(f.read())
 
     conn.commit()
