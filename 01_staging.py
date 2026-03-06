@@ -1,14 +1,11 @@
 """
 File: 01_staging.py
 Project: MTG Card Database
-Description: Generates code to create the staging table from the flat csv file
+Description: Generates the staging table from the flat csv file
 Author: Dave Sonnie
 Copyright (c) 2026 Dave Sonnie
 """
 
-# This Python script prints the psql command to create the staging table based on the header in the csv file
-# This script does not run the command, only produces the necessary text to do so; 
-# Use or adjust as necessary based on the specific implementation
 import csv
 import os
 import psycopg

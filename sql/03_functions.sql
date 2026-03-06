@@ -83,19 +83,14 @@ CREATE FUNCTION trg_update_total_cost()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $$
-DECLARE
-    v_total_cost INTEGER := 0;
 BEGIN
-    -- Get the sum of costs of pips related to this cost
-    SELECT SUM(mana_pip.mana_pip_cost)
-    INTO v_total_cost 
-    FROM mana_cost_mana_pip
-    JOIN mana_pip
-    ON mana_pip.mana_pip_id = mana_cost_mana_pip.mana_pip_id
-    WHERE mana_cost_mana_pip.mana_cost_id = NEW.mana_cost_id;
-    -- Update the mana_cost record's total cost
+    -- Increment the total cost by this pip's cost
     UPDATE mana_cost
-    SET mana_cost_total = v_total_cost
+    SET mana_cost_total = mana_cost_total + (
+        SELECT mana_pip_cost
+        FROM mana_pip
+        WHERE mana_pip_id = NEW.mana_pip_id
+    )
     WHERE mana_cost_id = NEW.mana_cost_id;
     RETURN NEW;
 END;
@@ -576,6 +571,7 @@ DECLARE
     v_card_toughness_id   INTEGER;
     v_oracle_text_id      INTEGER;
 BEGIN
+    --RAISE NOTICE 'Processing: % [%]', p_mtg_card_name, p_mtg_set_name;
     -- Set IDs
     v_mana_cost_id   := get_or_insert_mana_cost(p_mana_cost_text);
     v_artist_id      := get_or_insert_artist(p_artist_name);
