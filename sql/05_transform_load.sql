@@ -7,6 +7,18 @@
 -- Transformation and Load step
 -- Processes cards from the staging table into the cards table
 
+-- Optimizations:
+-- ===============================================================================================================
+-- The initial load-transform started out very fast, but quickly bottlenecked as memory overheads increased
+-- Breaking the operation up into commits of 1000 cards reduced this by over 90%
+--
+-- Bulk load time with single commit:
+-- psql:/work/sql/05_transform_load.sql:56: NOTICE:  Load complete. 105682 cards processed. Total time: 830871ms
+-- 
+-- Bulk load time with intermediary commits
+-- psql:/work/sql/05_transform_load.sql:57: NOTICE:  Load complete. 105682 cards processed. Total time: 50681ms
+-- ===============================================================================================================
+
 \set start_ts `date +%s.%N`
 \echo Script started at :start_ts
 -- Populate main tables from staging
@@ -63,12 +75,3 @@ SELECT
     (:end_ts::numeric - :start_ts::numeric) AS elapsed_seconds;
 
 
-/*
-psql:/work/sql/05_transform_load.sql:56: NOTICE:  Load complete. 105682 cards processed. Total time: 830871ms
-DO
-Script ended at 1772893900.872452351
- elapsed_seconds
------------------
-   830.888592369
-(1 row)
-*/
